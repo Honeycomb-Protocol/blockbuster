@@ -1,6 +1,6 @@
+use plerkle_serialization::error::PlerkleSerializationError;
 use std::io::Error;
 use thiserror::Error;
-use plerkle_serialization::error::PlerkleSerializationError;
 
 #[derive(Error, Debug)]
 pub enum BlockbusterError {
@@ -12,6 +12,8 @@ pub enum BlockbusterError {
     DeserializationError,
     #[error("Missing Bubblegum event data")]
     MissingBubblegumEventData,
+    #[error("Missing SPL Account compression event data")]
+    MissingAccountCompressionEventData,
     #[error("Data length is invalid.")]
     InvalidDataLength,
     #[error("Unknown anchor account discriminator.")]
