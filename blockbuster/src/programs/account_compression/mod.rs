@@ -19,7 +19,62 @@ use spl_account_compression::id as program_id;
 use spl_noop;
 
 use anchor_lang::Discriminator;
-use spl_account_compression::instruction::InitEmptyMerkleTree;
+use spl_account_compression::instruction::*;
+
+fn get_instruction_type(full_bytes: &[u8]) -> Instruction {
+    let disc: [u8; 8] = {
+        let mut disc = [0; 8];
+        disc.copy_from_slice(&full_bytes[..8]);
+        disc
+    };
+
+    match disc {
+        InitEmptyMerkleTree::DISCRIMINATOR => {
+            let init_empty_merkle_tree = InitEmptyMerkleTree::try_from_slice(&full_bytes).unwrap();
+            Instruction::InitTree {
+                max_depth: init_empty_merkle_tree.max_depth,
+                max_buffer_size: init_empty_merkle_tree.max_buffer_size,
+            }
+        }
+        ReplaceLeaf::DISCRIMINATOR => {
+            let replace_leaf = ReplaceLeaf::try_from_slice(&full_bytes).unwrap();
+            Instruction::ReplaceLeaf {
+                root: replace_leaf.root,
+                previous_leaf: replace_leaf.previous_leaf,
+                new_leaf: replace_leaf.new_leaf,
+                index: replace_leaf.index,
+            }
+        }
+        TransferAuthority::DISCRIMINATOR => {
+            let transfer_authority = TransferAuthority::try_from_slice(&full_bytes).unwrap();
+            Instruction::TransferAuthority {
+                new_authority: transfer_authority.new_authority,
+            }
+        }
+        VerifyLeaf::DISCRIMINATOR => {
+            let verify_leaf = VerifyLeaf::try_from_slice(&full_bytes).unwrap();
+            Instruction::VerifyLeaf {
+                root: verify_leaf.root,
+                leaf: verify_leaf.leaf,
+                index: verify_leaf.index,
+            }
+        }
+        Append::DISCRIMINATOR => {
+            let append = Append::try_from_slice(&full_bytes).unwrap();
+            Instruction::Append { leaf: append.leaf }
+        }
+        InsertOrAppend::DISCRIMINATOR => {
+            let insert_or_append = InsertOrAppend::try_from_slice(&full_bytes).unwrap();
+            Instruction::InsertOrAppend {
+                root: insert_or_append.root,
+                leaf: insert_or_append.leaf,
+                index: insert_or_append.index,
+            }
+        }
+        CloseEmptyTree::DISCRIMINATOR => Instruction::CloseTree,
+        _ => Instruction::Unknown,
+    }
+}
 
 #[derive(Eq, PartialEq)]
 pub enum Instruction {
@@ -62,7 +117,6 @@ pub struct AccountCompressionInstruction {
 
 impl AccountCompressionInstruction {
     pub fn new(ix: Instruction) -> Self {
-        InitEmptyMerkleTree::DISCRIMINATOR;
         AccountCompressionInstruction {
             instruction: ix,
             tree_update: None,
@@ -114,7 +168,7 @@ impl ProgramParser for AccountCompressionParser {
     ) -> Result<Box<(dyn ParseResult + 'static)>, BlockbusterError> {
         let InstructionBundle {
             txn_id,
-            // instruction,
+            instruction,
             inner_ix,
             // keys,
             ..
@@ -129,7 +183,7 @@ impl ProgramParser for AccountCompressionParser {
             }
         };
         let ix_type = get_instruction_type(&outer_ix_data);
-        let mut b_inst = AccountCompressionInstruction::new();
+        let mut b_inst = AccountCompressionInstruction::new(ix_type);
         if let Some(ixs) = inner_ix {
             for ix in ixs {
                 if ix.0 .0 == spl_noop::id().to_bytes() {
