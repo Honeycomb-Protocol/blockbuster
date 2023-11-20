@@ -22,9 +22,10 @@ use anchor_lang::Discriminator;
 use spl_account_compression::instruction::*;
 
 fn get_instruction_type(full_bytes: &[u8]) -> Instruction {
+    let (disc_slice, full_bytes) = full_bytes.split_at(8);
     let disc: [u8; 8] = {
         let mut disc = [0; 8];
-        disc.copy_from_slice(&full_bytes[..8]);
+        disc.copy_from_slice(&disc_slice);
         disc
     };
 
