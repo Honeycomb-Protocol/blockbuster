@@ -9,6 +9,11 @@ pub enum Program {
         instruction_result: AccountCompressionInstruction,
         account_result: (),
     },
+    Noop {
+        parser: noop::NoopParser,
+        instruction_result: NoopInstruction,
+        account_result: (),
+    },
 }
 
 impl ProgramParser for Program {}

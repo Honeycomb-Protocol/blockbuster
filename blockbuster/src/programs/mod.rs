@@ -3,6 +3,7 @@ use bubblegum::BubblegumInstruction;
 use candy_guard::CandyGuardAccountData;
 use candy_machine::CandyMachineAccountData;
 use candy_machine_core::CandyMachineCoreAccountData;
+use noop::NoopInstruction;
 use token_account::TokenProgramAccount;
 use token_metadata::TokenMetadataAccountState;
 
@@ -11,6 +12,7 @@ pub mod bubblegum;
 pub mod candy_guard;
 pub mod candy_machine;
 pub mod candy_machine_core;
+pub mod noop;
 pub mod token_account;
 pub mod token_metadata;
 
@@ -23,4 +25,5 @@ pub enum ProgramParseResult<'a> {
     CandyMachine(&'a CandyMachineAccountData),
     CandyMachineCore(&'a CandyMachineCoreAccountData),
     AccountCompression(&'a AccountCompressionInstruction),
+    Noop(&'a NoopInstruction),
 }
