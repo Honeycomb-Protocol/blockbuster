@@ -40,7 +40,14 @@ pub fn order_instructions<'a>(
             println!("outer instructions deserialization error");
             return ordered_ixs;
         }
-        Some(instructions) => instructions,
+        Some(instructions) => {
+            println!(
+                "BLOCKBUSTER: total outer instructions: {} for tx: {:?}",
+                instructions.len(),
+                transaction_info.signature()
+            );
+            instructions
+        }
     };
 
     if transaction_info.account_keys().is_none() {
@@ -99,8 +106,18 @@ pub fn order_instructions<'a>(
                     .collect::<Vec<IxPair>>()
             };
 
+        let inner_programs = if keys.take()[outer_instruction.program_id_index() as usize].0
+            == mpl_bubblegum::ID.to_bytes()
+        {
+            let mut p = programs.clone();
+            p.remove(spl_noop::ID.as_ref());
+            p
+        } else {
+            programs.clone()
+        };
+
         let hoister = non_hoisted_inner_instruction.clone();
-        let hoisted = hoist_known_programs(&programs, hoister);
+        let hoisted = hoist_known_programs(&inner_programs, hoister);
 
         for h in hoisted {
             ordered_ixs.push_back(h);
@@ -115,7 +132,7 @@ pub fn order_instructions<'a>(
                 continue;
             }
             let outer_program_id = **outer_program_id.unwrap();
-            if programs.get(outer_program_id.0.as_ref()).is_some() {
+            if inner_programs.get(outer_program_id.0.as_ref()).is_some() {
                 ordered_ixs.push_back((
                     (outer_program_id, outer_instruction),
                     Some(non_hoisted_inner_instruction),
