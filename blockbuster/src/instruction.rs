@@ -56,6 +56,7 @@ pub fn order_instructions<'a>(
     // Get account keys.
     let keys = RefCell::new(
         transaction_info
+            .to_owned()
             .account_keys()
             .iter()
             .flatten()
