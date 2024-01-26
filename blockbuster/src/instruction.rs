@@ -74,18 +74,22 @@ pub fn order_instructions<'a>(
                     .filter(|x| x.index() == outer_instruction_index as u8)
                     .flat_map(|x| {
                         if let Some(ixes) = x.instructions() {
+                            let mut instructions = Vec::<IxPair>::new();
                             ixes.iter()
                                 .filter_map(|ix| ix.compiled_instruction())
-                                .map(|ix| {
+                                .for_each(|ix| {
                                     let kb = keys.borrow();
                                     println!(
                                     "Transaction Keys len after borrow {} and program_id_index {}",
                                     kb.len(),
                                     ix.program_id_index()
                                 );
-                                    (*kb[ix.program_id_index() as usize], ix)
-                                })
-                                .collect::<Vec<IxPair>>()
+                                    let program_id = kb.get(ix.program_id_index() as usize);
+                                    if let Some(program_id) = program_id {
+                                        instructions.push((**program_id, ix))
+                                    }
+                                });
+                            instructions
                         } else {
                             Vec::new()
                         }
@@ -99,12 +103,15 @@ pub fn order_instructions<'a>(
                     .filter(|x| x.index() == outer_instruction_index as u8)
                     .flat_map(|x| {
                         if let Some(ixes) = x.instructions() {
-                            ixes.iter()
-                                .map(|ix| {
-                                    let kb = keys.borrow();
-                                    (*kb[ix.program_id_index() as usize], ix)
-                                })
-                                .collect::<Vec<IxPair>>()
+                            let mut instructions = Vec::<IxPair>::new();
+                            ixes.iter().for_each(|ix| {
+                                let kb = keys.borrow();
+                                let program_id = kb.get(ix.program_id_index() as usize);
+                                if let Some(program_id) = program_id {
+                                    instructions.push((**program_id, ix))
+                                }
+                            });
+                            instructions
                         } else {
                             Vec::new()
                         }
