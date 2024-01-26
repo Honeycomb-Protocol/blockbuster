@@ -61,6 +61,7 @@ pub fn order_instructions<'a>(
             .flatten()
             .collect::<Vec<_>>(),
     );
+    println!("Transaction Keys after flatten {:?}", keys);
 
     // Get inner instructions.
     let legacy_inner_ix_list = transaction_info.inner_instructions();
@@ -77,6 +78,11 @@ pub fn order_instructions<'a>(
                                 .filter_map(|ix| ix.compiled_instruction())
                                 .map(|ix| {
                                     let kb = keys.borrow();
+                                    println!(
+                                    "Transaction Keys len after borrow {} and program_id_index {}",
+                                    kb.len(),
+                                    ix.program_id_index()
+                                );
                                     (*kb[ix.program_id_index() as usize], ix)
                                 })
                                 .collect::<Vec<IxPair>>()
