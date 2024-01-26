@@ -119,37 +119,38 @@ pub fn order_instructions<'a>(
                     .collect::<Vec<IxPair>>()
             };
 
-        let inner_programs = if keys.take()[outer_instruction.program_id_index() as usize].0
-            == mpl_bubblegum::ID.to_bytes()
-        {
-            let mut p = programs.clone();
-            p.remove(spl_noop::ID.as_ref());
-            p
-        } else {
-            programs.clone()
-        };
+        let kt = keys.take();
+        if let Some(program_id) = kt.get(outer_instruction.program_id_index() as usize) {
+            let inner_programs = if program_id.0 == mpl_bubblegum::ID.to_bytes() {
+                let mut p = programs.clone();
+                p.remove(spl_noop::ID.as_ref());
+                p
+            } else {
+                programs.clone()
+            };
 
-        let hoister = non_hoisted_inner_instruction.clone();
-        let hoisted = hoist_known_programs(&inner_programs, hoister);
+            let hoister = non_hoisted_inner_instruction.clone();
+            let hoisted = hoist_known_programs(&inner_programs, hoister);
 
-        for h in hoisted {
-            ordered_ixs.push_back(h);
-        }
-
-        {
-            let kb = keys.borrow();
-            let outer_ix_program_id_index = outer_instruction.program_id_index() as usize;
-            let outer_program_id = kb.get(outer_ix_program_id_index);
-            if outer_program_id.is_none() {
-                eprintln!("outer program id deserialization error");
-                continue;
+            for h in hoisted {
+                ordered_ixs.push_back(h);
             }
-            let outer_program_id = **outer_program_id.unwrap();
-            if inner_programs.get(outer_program_id.0.as_ref()).is_some() {
-                ordered_ixs.push_back((
-                    (outer_program_id, outer_instruction),
-                    Some(non_hoisted_inner_instruction),
-                ));
+
+            {
+                let kb = keys.borrow();
+                let outer_ix_program_id_index = outer_instruction.program_id_index() as usize;
+                let outer_program_id = kb.get(outer_ix_program_id_index);
+                if outer_program_id.is_none() {
+                    eprintln!("outer program id deserialization error");
+                    continue;
+                }
+                let outer_program_id = **outer_program_id.unwrap();
+                if inner_programs.get(outer_program_id.0.as_ref()).is_some() {
+                    ordered_ixs.push_back((
+                        (outer_program_id, outer_instruction),
+                        Some(non_hoisted_inner_instruction),
+                    ));
+                }
             }
         }
     }
