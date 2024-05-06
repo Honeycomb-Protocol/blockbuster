@@ -12,6 +12,7 @@ pub mod bubblegum;
 pub mod candy_guard;
 pub mod candy_machine;
 pub mod candy_machine_core;
+pub mod hpl_character_manager;
 pub mod noop;
 pub mod token_account;
 pub mod token_metadata;
