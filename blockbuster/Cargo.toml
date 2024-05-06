@@ -12,7 +12,7 @@ readme = "../README.md"
 crate-type = ["cdylib", "lib"]
 
 [dependencies]
-spl-account-compression = { version = "0.2.0", features = ["no-entrypoint"] }
+spl-account-compression = { version = "0.3.0", features = ["no-entrypoint", "cpi"] }
 spl-noop = { version = "0.2.0", features = ["no-entrypoint"] }
 mpl-bubblegum = "=1.0.1-beta.4"
 mpl-candy-guard = { version = "2.0.0", features = ["no-entrypoint"] }

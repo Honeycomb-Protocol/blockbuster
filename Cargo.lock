@@ -811,7 +811,7 @@ dependencies = [
  "solana-geyser-plugin-interface",
  "solana-sdk",
  "solana-transaction-status",
- "spl-account-compression 0.2.0",
+ "spl-account-compression",
  "spl-concurrent-merkle-tree",
  "spl-noop",
  "spl-token 4.0.0",
@@ -1922,7 +1922,7 @@ dependencies = [
  "hpl-toolkit-macro-merkle-tree-apply-fn-deep",
  "hpl-toolkit-macro-merkle-tree-utils",
  "serde_json",
- "spl-account-compression 0.3.0",
+ "spl-account-compression",
 ]
 
 [[package]]
@@ -4555,18 +4555,6 @@ checksum = "44d01ac02a6ccf3e07db148d2be087da624fea0221a16152ed01f0496a6b0a27"
 dependencies = [
  "base64ct",
  "der",
-]
-
-[[package]]
-name = "spl-account-compression"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df052fd79e45c75c84ef20f5f2dcf037aeed230d0f2400bf68fa388cc0ece240"
-dependencies = [
- "anchor-lang 0.28.0",
- "bytemuck",
- "spl-concurrent-merkle-tree",
- "spl-noop",
 ]
 
 [[package]]
