@@ -32,7 +32,7 @@ thiserror = "1.0.32"
 solana-sdk = "~1.16.11"
 anchor-lang = { version = "0.29.0" }
 log = "0.4.17"
-hpl-toolkit = "0.0.3-beta.15"
+hpl-toolkit = "0.0.3-beta.21"
 
 [dev-dependencies]
 rand = "0.8.5"
